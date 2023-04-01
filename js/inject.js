@@ -1,7 +1,5 @@
 const storage = (navigator.userAgent.includes("Firefox") ? browser : chrome).storage.sync;
 
-console.log("Injecting...");
-
 storage.get({
     colors: false,
     size: false,
@@ -9,11 +7,15 @@ storage.get({
 }).then(({ colors, size, pain }) => {
     const changedNodes = [];
 
-    function recurse(node) {
-        /*console.log({ className: node.className, a: !node.className,
-            b: typeof node.className !== "string",
-            c: node.className && !node.className.split(" ").find((c) => ["v-application", "v-application--wrap", "app-base", "v-main", "v-main__wrap", "dash-div"].includes(c)) });*/
+    if (pain) {
+        const style = document.createElement("link");
+        style.href = chrome.runtime.getURL("css/common.css");
+        style.type = "text/css";
+        style.rel = "stylesheet";
+        document.head.appendChild(style);
+    }
 
+    function recurse(node) {
         if (!changedNodes.includes(node) &&
             colors &&
             node.style &&
@@ -39,7 +41,4 @@ storage.get({
         if (colors || size)
             recurse(document.body);
     }, 100);
-
-    if (colors || size)
-        recurse(document.body);
 });
